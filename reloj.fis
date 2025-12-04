@@ -24,7 +24,6 @@ int centro_y = 32;
 // Longitudes de las manecillas
 int long_horas = 12;
 int long_minutos = 18;
-int long_segundos = 22;
 
 // Estados de teclas para detección de falling edge
 int tecla1_anterior = 0;
@@ -52,6 +51,7 @@ int cos_tabla[60];
 
 // Variables auxiliares
 int i = 0;
+int j = 0;
 int angulo_horas = 0;
 int angulo_minutos = 0;
 int pos_horas_x = 0;
@@ -64,7 +64,7 @@ int abs_dy = 0;
 
 // ========== INICIALIZAR TABLAS TRIGONOMÉTRICAS ==========
 // Valores de seno y coseno multiplicados por 100 para evitar flotantes
-// Solo necesitamos 60 valores (uno por minuto/segundo)
+// 60 valores (uno por minuto/segundo)
 
 sin_tabla[0] = 0;
 sin_tabla[1] = 10;
@@ -97,35 +97,35 @@ sin_tabla[27] = 31;
 sin_tabla[28] = 21;
 sin_tabla[29] = 10;
 sin_tabla[30] = 0;
-sin_tabla[31] = -10;
-sin_tabla[32] = -21;
-sin_tabla[33] = -31;
-sin_tabla[34] = -41;
-sin_tabla[35] = -50;
-sin_tabla[36] = -59;
-sin_tabla[37] = -67;
-sin_tabla[38] = -74;
-sin_tabla[39] = -81;
-sin_tabla[40] = -87;
-sin_tabla[41] = -91;
-sin_tabla[42] = -95;
-sin_tabla[43] = -98;
-sin_tabla[44] = -99;
-sin_tabla[45] = -100;
-sin_tabla[46] = -99;
-sin_tabla[47] = -98;
-sin_tabla[48] = -95;
-sin_tabla[49] = -91;
-sin_tabla[50] = -87;
-sin_tabla[51] = -81;
-sin_tabla[52] = -74;
-sin_tabla[53] = -67;
-sin_tabla[54] = -59;
-sin_tabla[55] = -50;
-sin_tabla[56] = -41;
-sin_tabla[57] = -31;
-sin_tabla[58] = -21;
-sin_tabla[59] = -10;
+sin_tabla[31] = 0 - 10;
+sin_tabla[32] = 0 - 21;
+sin_tabla[33] = 0 - 31;
+sin_tabla[34] = 0 - 41;
+sin_tabla[35] = 0 - 50;
+sin_tabla[36] = 0 - 59;
+sin_tabla[37] = 0 - 67;
+sin_tabla[38] = 0 - 74;
+sin_tabla[39] = 0 - 81;
+sin_tabla[40] = 0 - 87;
+sin_tabla[41] = 0 - 91;
+sin_tabla[42] = 0 - 95;
+sin_tabla[43] = 0 - 98;
+sin_tabla[44] = 0 - 99;
+sin_tabla[45] = 0 - 100;
+sin_tabla[46] = 0 - 99;
+sin_tabla[47] = 0 - 98;
+sin_tabla[48] = 0 - 95;
+sin_tabla[49] = 0 - 91;
+sin_tabla[50] = 0 - 87;
+sin_tabla[51] = 0 - 81;
+sin_tabla[52] = 0 - 74;
+sin_tabla[53] = 0 - 67;
+sin_tabla[54] = 0 - 59;
+sin_tabla[55] = 0 - 50;
+sin_tabla[56] = 0 - 41;
+sin_tabla[57] = 0 - 31;
+sin_tabla[58] = 0 - 21;
+sin_tabla[59] = 0 - 10;
 
 cos_tabla[0] = 100;
 cos_tabla[1] = 99;
@@ -143,35 +143,35 @@ cos_tabla[12] = 31;
 cos_tabla[13] = 21;
 cos_tabla[14] = 10;
 cos_tabla[15] = 0;
-cos_tabla[16] = -10;
-cos_tabla[17] = -21;
-cos_tabla[18] = -31;
-cos_tabla[19] = -41;
-cos_tabla[20] = -50;
-cos_tabla[21] = -59;
-cos_tabla[22] = -67;
-cos_tabla[23] = -74;
-cos_tabla[24] = -81;
-cos_tabla[25] = -87;
-cos_tabla[26] = -91;
-cos_tabla[27] = -95;
-cos_tabla[28] = -98;
-cos_tabla[29] = -99;
-cos_tabla[30] = -100;
-cos_tabla[31] = -99;
-cos_tabla[32] = -98;
-cos_tabla[33] = -95;
-cos_tabla[34] = -91;
-cos_tabla[35] = -87;
-cos_tabla[36] = -81;
-cos_tabla[37] = -74;
-cos_tabla[38] = -67;
-cos_tabla[39] = -59;
-cos_tabla[40] = -50;
-cos_tabla[41] = -41;
-cos_tabla[42] = -31;
-cos_tabla[43] = -21;
-cos_tabla[44] = -10;
+cos_tabla[16] = 0 - 10;
+cos_tabla[17] = 0 - 21;
+cos_tabla[18] = 0 - 31;
+cos_tabla[19] = 0 - 41;
+cos_tabla[20] = 0 - 50;
+cos_tabla[21] = 0 - 59;
+cos_tabla[22] = 0 - 67;
+cos_tabla[23] = 0 - 74;
+cos_tabla[24] = 0 - 81;
+cos_tabla[25] = 0 - 87;
+cos_tabla[26] = 0 - 91;
+cos_tabla[27] = 0 - 95;
+cos_tabla[28] = 0 - 98;
+cos_tabla[29] = 0 - 99;
+cos_tabla[30] = 0 - 100;
+cos_tabla[31] = 0 - 99;
+cos_tabla[32] = 0 - 98;
+cos_tabla[33] = 0 - 95;
+cos_tabla[34] = 0 - 91;
+cos_tabla[35] = 0 - 87;
+cos_tabla[36] = 0 - 81;
+cos_tabla[37] = 0 - 74;
+cos_tabla[38] = 0 - 67;
+cos_tabla[39] = 0 - 59;
+cos_tabla[40] = 0 - 50;
+cos_tabla[41] = 0 - 41;
+cos_tabla[42] = 0 - 31;
+cos_tabla[43] = 0 - 21;
+cos_tabla[44] = 0 - 10;
 cos_tabla[45] = 0;
 cos_tabla[46] = 10;
 cos_tabla[47] = 21;
@@ -192,7 +192,18 @@ cos_tabla[59] = 99;
 int continuar = 1;
 while (continuar == 1) {
     
-    // Limpiar pantalla (dibujar marco)
+    // LIMPIAR TODA LA PANTALLA PRIMERO
+    i = 0;
+    while (i < 64) {
+        j = 0;
+        while (j < 64) {
+            PIXEL i j 0;
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    // Dibujar marco
     i = 0;
     while (i < 64) {
         PIXEL i 0 1;
@@ -263,14 +274,14 @@ while (continuar == 1) {
     
     // Valor absoluto de dx
     if (dx < 0) {
-        abs_dx = -dx;
+        abs_dx = 0 - dx;
     } else {
         abs_dx = dx;
     }
     
     // Valor absoluto de dy
     if (dy < 0) {
-        abs_dy = -dy;
+        abs_dy = 0 - dy;
     } else {
         abs_dy = dy;
     }
@@ -279,14 +290,14 @@ while (continuar == 1) {
     if (x0 < x1) {
         sx = 1;
     } else {
-        sx = -1;
+        sx = 0 - 1;
     }
     
     // Dirección sy
     if (y0 < y1) {
         sy = 1;
     } else {
-        sy = -1;
+        sy = 0 - 1;
     }
     
     err = abs_dx - abs_dy;
@@ -301,6 +312,7 @@ while (continuar == 1) {
                 if (y >= 0) {
                     if (y < 64) {
                         PIXEL x y 1;
+                        PIXEL x y 1;
                     }
                 }
             }
@@ -314,7 +326,8 @@ while (continuar == 1) {
         
         e2 = err * 2;
         
-        if (e2 > -abs_dy) {
+        temp = 0 - abs_dy;
+        if (e2 > temp) {
             err = err - abs_dy;
             x = x + sx;
         }
@@ -337,13 +350,13 @@ while (continuar == 1) {
     dy = y1 - y0;
     
     if (dx < 0) {
-        abs_dx = -dx;
+        abs_dx = 0 - dx;
     } else {
         abs_dx = dx;
     }
     
     if (dy < 0) {
-        abs_dy = -dy;
+        abs_dy = 0 - dy;
     } else {
         abs_dy = dy;
     }
@@ -351,13 +364,13 @@ while (continuar == 1) {
     if (x0 < x1) {
         sx = 1;
     } else {
-        sx = -1;
+        sx = 0 - 1;
     }
     
     if (y0 < y1) {
         sy = 1;
     } else {
-        sy = -1;
+        sy = 0 - 1;
     }
     
     err = abs_dx - abs_dy;
@@ -385,7 +398,8 @@ while (continuar == 1) {
         
         e2 = err * 2;
         
-        if (e2 > -abs_dy) {
+        temp = 0 - abs_dy;
+        if (e2 > temp) {
             err = err - abs_dy;
             x = x + sx;
         }
