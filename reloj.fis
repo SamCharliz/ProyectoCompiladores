@@ -1,0 +1,456 @@
+// reloj_analogico.fis - Reloj Analógico para FIS-25
+// Proyecto de Compiladores 2025
+// Control: Tecla 1 = incrementar horas, Tecla 2 = incrementar minutos
+
+// ========== CONFIGURACIÓN INICIAL ==========
+PRINT "=== RELOJ ANALOGICO FIS-25 ===";
+PRINT "Ingrese hora inicial (0-23): ";
+int horas = 0;
+INPUT horas;
+
+PRINT "Ingrese minutos iniciales (0-59): ";
+int minutos = 0;
+INPUT minutos;
+
+PRINT "Reloj configurado. Controles:";
+PRINT "Tecla 1: Incrementar horas";
+PRINT "Tecla 2: Incrementar minutos";
+
+// ========== VARIABLES GLOBALES ==========
+// Centro de la pantalla 64x64
+int centro_x = 32;
+int centro_y = 32;
+
+// Longitudes de las manecillas
+int long_horas = 12;
+int long_minutos = 18;
+
+// Estados de teclas para detección de falling edge
+int tecla1_anterior = 0;
+int tecla2_anterior = 0;
+int tecla1_actual = 0;
+int tecla2_actual = 0;
+
+// Variables para dibujo
+int x0 = 0;
+int y0 = 0;
+int x1 = 0;
+int y1 = 0;
+int dx = 0;
+int dy = 0;
+int sx = 0;
+int sy = 0;
+int err = 0;
+int e2 = 0;
+int x = 0;
+int y = 0;
+
+// Variables trigonométricas (tablas precalculadas)
+int sin_tabla[60];
+int cos_tabla[60];
+
+// Variables auxiliares
+int i = 0;
+int j = 0;
+int angulo_horas = 0;
+int angulo_minutos = 0;
+int pos_horas_x = 0;
+int pos_horas_y = 0;
+int pos_minutos_x = 0;
+int pos_minutos_y = 0;
+int temp = 0;
+int abs_dx = 0;
+int abs_dy = 0;
+
+// ========== INICIALIZAR TABLAS TRIGONOMÉTRICAS ==========
+// Valores de seno y coseno multiplicados por 100 para evitar flotantes
+// 60 valores (uno por minuto/segundo)
+
+sin_tabla[0] = 0;
+sin_tabla[1] = 10;
+sin_tabla[2] = 21;
+sin_tabla[3] = 31;
+sin_tabla[4] = 41;
+sin_tabla[5] = 50;
+sin_tabla[6] = 59;
+sin_tabla[7] = 67;
+sin_tabla[8] = 74;
+sin_tabla[9] = 81;
+sin_tabla[10] = 87;
+sin_tabla[11] = 91;
+sin_tabla[12] = 95;
+sin_tabla[13] = 98;
+sin_tabla[14] = 99;
+sin_tabla[15] = 100;
+sin_tabla[16] = 99;
+sin_tabla[17] = 98;
+sin_tabla[18] = 95;
+sin_tabla[19] = 91;
+sin_tabla[20] = 87;
+sin_tabla[21] = 81;
+sin_tabla[22] = 74;
+sin_tabla[23] = 67;
+sin_tabla[24] = 59;
+sin_tabla[25] = 50;
+sin_tabla[26] = 41;
+sin_tabla[27] = 31;
+sin_tabla[28] = 21;
+sin_tabla[29] = 10;
+sin_tabla[30] = 0;
+sin_tabla[31] = 0 - 10;
+sin_tabla[32] = 0 - 21;
+sin_tabla[33] = 0 - 31;
+sin_tabla[34] = 0 - 41;
+sin_tabla[35] = 0 - 50;
+sin_tabla[36] = 0 - 59;
+sin_tabla[37] = 0 - 67;
+sin_tabla[38] = 0 - 74;
+sin_tabla[39] = 0 - 81;
+sin_tabla[40] = 0 - 87;
+sin_tabla[41] = 0 - 91;
+sin_tabla[42] = 0 - 95;
+sin_tabla[43] = 0 - 98;
+sin_tabla[44] = 0 - 99;
+sin_tabla[45] = 0 - 100;
+sin_tabla[46] = 0 - 99;
+sin_tabla[47] = 0 - 98;
+sin_tabla[48] = 0 - 95;
+sin_tabla[49] = 0 - 91;
+sin_tabla[50] = 0 - 87;
+sin_tabla[51] = 0 - 81;
+sin_tabla[52] = 0 - 74;
+sin_tabla[53] = 0 - 67;
+sin_tabla[54] = 0 - 59;
+sin_tabla[55] = 0 - 50;
+sin_tabla[56] = 0 - 41;
+sin_tabla[57] = 0 - 31;
+sin_tabla[58] = 0 - 21;
+sin_tabla[59] = 0 - 10;
+
+cos_tabla[0] = 100;
+cos_tabla[1] = 99;
+cos_tabla[2] = 98;
+cos_tabla[3] = 95;
+cos_tabla[4] = 91;
+cos_tabla[5] = 87;
+cos_tabla[6] = 81;
+cos_tabla[7] = 74;
+cos_tabla[8] = 67;
+cos_tabla[9] = 59;
+cos_tabla[10] = 50;
+cos_tabla[11] = 41;
+cos_tabla[12] = 31;
+cos_tabla[13] = 21;
+cos_tabla[14] = 10;
+cos_tabla[15] = 0;
+cos_tabla[16] = 0 - 10;
+cos_tabla[17] = 0 - 21;
+cos_tabla[18] = 0 - 31;
+cos_tabla[19] = 0 - 41;
+cos_tabla[20] = 0 - 50;
+cos_tabla[21] = 0 - 59;
+cos_tabla[22] = 0 - 67;
+cos_tabla[23] = 0 - 74;
+cos_tabla[24] = 0 - 81;
+cos_tabla[25] = 0 - 87;
+cos_tabla[26] = 0 - 91;
+cos_tabla[27] = 0 - 95;
+cos_tabla[28] = 0 - 98;
+cos_tabla[29] = 0 - 99;
+cos_tabla[30] = 0 - 100;
+cos_tabla[31] = 0 - 99;
+cos_tabla[32] = 0 - 98;
+cos_tabla[33] = 0 - 95;
+cos_tabla[34] = 0 - 91;
+cos_tabla[35] = 0 - 87;
+cos_tabla[36] = 0 - 81;
+cos_tabla[37] = 0 - 74;
+cos_tabla[38] = 0 - 67;
+cos_tabla[39] = 0 - 59;
+cos_tabla[40] = 0 - 50;
+cos_tabla[41] = 0 - 41;
+cos_tabla[42] = 0 - 31;
+cos_tabla[43] = 0 - 21;
+cos_tabla[44] = 0 - 10;
+cos_tabla[45] = 0;
+cos_tabla[46] = 10;
+cos_tabla[47] = 21;
+cos_tabla[48] = 31;
+cos_tabla[49] = 41;
+cos_tabla[50] = 50;
+cos_tabla[51] = 59;
+cos_tabla[52] = 67;
+cos_tabla[53] = 74;
+cos_tabla[54] = 81;
+cos_tabla[55] = 87;
+cos_tabla[56] = 91;
+cos_tabla[57] = 95;
+cos_tabla[58] = 98;
+cos_tabla[59] = 99;
+
+// ========== BUCLE PRINCIPAL ==========
+int continuar = 1;
+while (continuar == 1) {
+    
+    // LIMPIAR TODA LA PANTALLA PRIMERO
+    i = 0;
+    while (i < 64) {
+        j = 0;
+        while (j < 64) {
+            PIXEL i j 0;
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    // Dibujar marco
+    i = 0;
+    while (i < 64) {
+        PIXEL i 0 1;
+        PIXEL i 63 1;
+        PIXEL 0 i 1;
+        PIXEL 63 i 1;
+        i = i + 1;
+    }
+    
+    // Dibujar marcas de horas (12, 3, 6, 9)
+    PIXEL 32 8 1;
+    PIXEL 32 9 1;
+    PIXEL 56 32 1;
+    PIXEL 55 32 1;
+    PIXEL 32 56 1;
+    PIXEL 32 55 1;
+    PIXEL 8 32 1;
+    PIXEL 9 32 1;
+    
+    // ========== CALCULAR POSICIONES DE MANECILLAS ==========
+    
+    // Manecilla de horas (0-11, cada hora son 5 minutos en el reloj)
+    temp = horas % 12;
+    angulo_horas = temp * 5;
+    angulo_horas = angulo_horas + (minutos / 12);
+    
+    if (angulo_horas >= 60) {
+        angulo_horas = angulo_horas - 60;
+    }
+    
+    // Calcular posición final de manecilla de horas
+    temp = sin_tabla[angulo_horas];
+    temp = temp * long_horas;
+    temp = temp / 100;
+    pos_horas_x = centro_x + temp;
+    
+    temp = cos_tabla[angulo_horas];
+    temp = temp * long_horas;
+    temp = temp / 100;
+    pos_horas_y = centro_y - temp;
+    
+    // Manecilla de minutos
+    angulo_minutos = minutos;
+    if (angulo_minutos >= 60) {
+        angulo_minutos = 0;
+    }
+    
+    temp = sin_tabla[angulo_minutos];
+    temp = temp * long_minutos;
+    temp = temp / 100;
+    pos_minutos_x = centro_x + temp;
+    
+    temp = cos_tabla[angulo_minutos];
+    temp = temp * long_minutos;
+    temp = temp / 100;
+    pos_minutos_y = centro_y - temp;
+    
+    // ========== DIBUJAR MANECILLAS CON BRESENHAM ==========
+    
+    // Dibujar manecilla de horas
+    x0 = centro_x;
+    y0 = centro_y;
+    x1 = pos_horas_x;
+    y1 = pos_horas_y;
+    
+    dx = x1 - x0;
+    dy = y1 - y0;
+    
+    // Valor absoluto de dx
+    if (dx < 0) {
+        abs_dx = 0 - dx;
+    } else {
+        abs_dx = dx;
+    }
+    
+    // Valor absoluto de dy
+    if (dy < 0) {
+        abs_dy = 0 - dy;
+    } else {
+        abs_dy = dy;
+    }
+    
+    // Dirección sx
+    if (x0 < x1) {
+        sx = 1;
+    } else {
+        sx = 0 - 1;
+    }
+    
+    // Dirección sy
+    if (y0 < y1) {
+        sy = 1;
+    } else {
+        sy = 0 - 1;
+    }
+    
+    err = abs_dx - abs_dy;
+    x = x0;
+    y = y0;
+    
+    // Algoritmo de Bresenham para horas
+    i = 0;
+    while (i < 50) {
+        if (x >= 0) {
+            if (x < 64) {
+                if (y >= 0) {
+                    if (y < 64) {
+                        PIXEL x y 1;
+                        PIXEL x y 1;
+                    }
+                }
+            }
+        }
+        
+        if (x == x1) {
+            if (y == y1) {
+                i = 50;
+            }
+        }
+        
+        e2 = err * 2;
+        
+        temp = 0 - abs_dy;
+        if (e2 > temp) {
+            err = err - abs_dy;
+            x = x + sx;
+        }
+        
+        if (e2 < abs_dx) {
+            err = err + abs_dx;
+            y = y + sy;
+        }
+        
+        i = i + 1;
+    }
+    
+    // Dibujar manecilla de minutos
+    x0 = centro_x;
+    y0 = centro_y;
+    x1 = pos_minutos_x;
+    y1 = pos_minutos_y;
+    
+    dx = x1 - x0;
+    dy = y1 - y0;
+    
+    if (dx < 0) {
+        abs_dx = 0 - dx;
+    } else {
+        abs_dx = dx;
+    }
+    
+    if (dy < 0) {
+        abs_dy = 0 - dy;
+    } else {
+        abs_dy = dy;
+    }
+    
+    if (x0 < x1) {
+        sx = 1;
+    } else {
+        sx = 0 - 1;
+    }
+    
+    if (y0 < y1) {
+        sy = 1;
+    } else {
+        sy = 0 - 1;
+    }
+    
+    err = abs_dx - abs_dy;
+    x = x0;
+    y = y0;
+    
+    // Algoritmo de Bresenham para minutos
+    i = 0;
+    while (i < 50) {
+        if (x >= 0) {
+            if (x < 64) {
+                if (y >= 0) {
+                    if (y < 64) {
+                        PIXEL x y 1;
+                    }
+                }
+            }
+        }
+        
+        if (x == x1) {
+            if (y == y1) {
+                i = 50;
+            }
+        }
+        
+        e2 = err * 2;
+        
+        temp = 0 - abs_dy;
+        if (e2 > temp) {
+            err = err - abs_dy;
+            x = x + sx;
+        }
+        
+        if (e2 < abs_dx) {
+            err = err + abs_dx;
+            y = y + sy;
+        }
+        
+        i = i + 1;
+    }
+    
+    // Dibujar centro del reloj
+    PIXEL centro_x centro_y 1;
+    PIXEL 31 32 1;
+    PIXEL 33 32 1;
+    PIXEL 32 31 1;
+    PIXEL 32 33 1;
+    
+    // ========== DETECTAR TECLAS (FALLING EDGE) ==========
+    
+    KEY 1 tecla1_actual;
+    KEY 2 tecla2_actual;
+    
+    // Detectar falling edge en tecla 1 (incrementar horas)
+    if (tecla1_anterior == 1) {
+        if (tecla1_actual == 0) {
+            horas = horas + 1;
+            if (horas >= 24) {
+                horas = 0;
+            }
+        }
+    }
+    
+    // Detectar falling edge en tecla 2 (incrementar minutos)
+    if (tecla2_anterior == 1) {
+        if (tecla2_actual == 0) {
+            minutos = minutos + 1;
+            if (minutos >= 60) {
+                minutos = 0;
+                horas = horas + 1;
+                if (horas >= 24) {
+                    horas = 0;
+                }
+            }
+        }
+    }
+    
+    // Actualizar estados anteriores
+    tecla1_anterior = tecla1_actual;
+    tecla2_anterior = tecla2_actual;
+}
+
+PRINT "Reloj finalizado";

@@ -1,0 +1,118 @@
+int ballX = 32;
+int ballY = 32;
+int dirX = 1;
+int dirY = 1;
+
+int p1Y = 28;
+int p2Y = 28;
+
+int keyW = 0;
+int keyS = 0;
+int keyUp = 0;
+int keyDown = 0;
+
+int nextX = 0;
+int nextY = 0;
+
+// Variable para el retardo
+int delay = 0;
+
+while (true) {
+    
+    // === 1. LIMPIEZA ===
+    PIXEL ballX ballY 0;
+    
+    // Paleta 1
+    PIXEL 2 p1Y 0;
+    PIXEL 2 p1Y+1 0;
+    PIXEL 2 p1Y+2 0;
+    PIXEL 2 p1Y+3 0;
+    PIXEL 2 p1Y+4 0;
+    PIXEL 2 p1Y+5 0;
+
+    // Paleta 2
+    PIXEL 61 p2Y 0;
+    PIXEL 61 p2Y+1 0;
+    PIXEL 61 p2Y+2 0;
+    PIXEL 61 p2Y+3 0;
+    PIXEL 61 p2Y+4 0;
+    PIXEL 61 p2Y+5 0;
+
+    // === 2. INPUT ===
+    KEY 4 keyW; // W
+    KEY 5 keyS; // S
+    KEY 0 keyUp;   // Flecha Arriba
+    KEY 1 keyDown; // Flecha Abajo
+
+    if (keyW) {
+        if (p1Y > 1) { p1Y = p1Y - 2; }
+    }
+    if (keyS) {
+        if (p1Y < 57) { p1Y = p1Y + 2; }
+    }
+
+    if (keyUp) {
+        if (p2Y > 1) { p2Y = p2Y - 2; }
+    }
+    if (keyDown) {
+        if (p2Y < 57) { p2Y = p2Y + 2; }
+    }
+
+    // === 3. LOGICA BOLA ===
+    nextX = ballX + dirX;
+    nextY = ballY + dirY;
+
+    // Rebote vertical
+    if (nextY <= 0) { dirY = 1; }
+    if (nextY >= 63) { dirY = 0 - 1; }
+
+    // Colisión Paleta 1
+    if (nextX <= 3) {
+        if (nextY >= p1Y && nextY <= p1Y + 6) {
+            dirX = 1;
+        }
+    }
+
+    // Colisión Paleta 2
+    if (nextX >= 60) {
+        if (nextY >= p2Y && nextY <= p2Y + 6) {
+            dirX = 0 - 1;
+        }
+    }
+
+    // Gol / Reset
+    if (nextX < 0) {
+        ballX = 32; ballY = 32; dirX = 1;
+    }
+    if (nextX > 63) {
+        ballX = 32; ballY = 32; dirX = 0 - 1;
+    }
+
+    ballX = ballX + dirX;
+    ballY = ballY + dirY;
+
+    // === 4. DIBUJADO ===
+    PIXEL ballX ballY 1;
+
+    PIXEL 2 p1Y 1;
+    PIXEL 2 p1Y+1 1;
+    PIXEL 2 p1Y+2 1;
+    PIXEL 2 p1Y+3 1;
+    PIXEL 2 p1Y+4 1;
+    PIXEL 2 p1Y+5 1;
+
+    PIXEL 61 p2Y 1;
+    PIXEL 61 p2Y+1 1;
+    PIXEL 61 p2Y+2 1;
+    PIXEL 61 p2Y+3 1;
+    PIXEL 61 p2Y+4 1;
+    PIXEL 61 p2Y+5 1;
+
+    // retardo 
+    // Ajustar el 500 a un número mayor si sigue muy rápido (ej. 1000, 2000)
+    // O a un número menor si va muy lento.
+    delay = 0;
+    while (delay < 1000) {
+        delay = delay + 1;
+    }
+}
