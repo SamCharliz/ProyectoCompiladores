@@ -1,4 +1,4 @@
-/* codegen.c - Generación de código intermedio FIS-25 */
+/* codegen.c - Generación de código intermedio FIS-25 OPTIMIZADO */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,11 +45,24 @@ int getTempCount() {
     return tempCount;
 }
 
+// NUEVA FUNCIÓN: Optimizar expresiones constantes
+int isConstant(ASTNode* node) {
+    return node && (node->type == NODE_INT || 
+                    node->type == NODE_FLOAT || 
+                    node->type == NODE_BOOL);
+}
+
 char* generateExpr(ASTNode* node) {
     if (!node) return NULL;
     
     switch (node->type) {
         case NODE_INT: {
+            // OPTIMIZACIÓN: Retornar el literal directamente si es pequeño
+            if (node->intValue >= 0 && node->intValue <= 100) {
+                char* literal = malloc(20);
+                sprintf(literal, "%d", node->intValue);
+                return literal;
+            }
             char* temp = newTemp();
             printf("ASSIGN %d %s\n", node->intValue, temp);
             return temp;
@@ -80,7 +93,6 @@ char* generateExpr(ASTNode* node) {
                 // Índice dinámico - más complejo
                 char* indexVar = generateExpr(node->index);
                 char* temp = newTemp();
-                // Aquí se requeriría lógica adicional para acceso dinámico
                 printf("// TODO: Acceso dinámico arr[%s]\n", indexVar);
                 return temp;
             }
@@ -92,7 +104,15 @@ char* generateExpr(ASTNode* node) {
             return lengthVar;
         }
         
+        // OPTIMIZACIÓN: Operaciones con constantes
         case NODE_ADD: {
+            // Si ambos son constantes, no generar código
+            if (isConstant(node->left) && isConstant(node->right)) {
+                int result = node->left->intValue + node->right->intValue;
+                char* literal = malloc(20);
+                sprintf(literal, "%d", result);
+                return literal;
+            }
             char* left = generateExpr(node->left);
             char* right = generateExpr(node->right);
             char* result = newTemp();
@@ -101,6 +121,12 @@ char* generateExpr(ASTNode* node) {
         }
         
         case NODE_SUB: {
+            if (isConstant(node->left) && isConstant(node->right)) {
+                int result = node->left->intValue - node->right->intValue;
+                char* literal = malloc(20);
+                sprintf(literal, "%d", result);
+                return literal;
+            }
             char* left = generateExpr(node->left);
             char* right = generateExpr(node->right);
             char* result = newTemp();
@@ -109,6 +135,12 @@ char* generateExpr(ASTNode* node) {
         }
         
         case NODE_MUL: {
+            if (isConstant(node->left) && isConstant(node->right)) {
+                int result = node->left->intValue * node->right->intValue;
+                char* literal = malloc(20);
+                sprintf(literal, "%d", result);
+                return literal;
+            }
             char* left = generateExpr(node->left);
             char* right = generateExpr(node->right);
             char* result = newTemp();
@@ -184,7 +216,6 @@ char* generateExpr(ASTNode* node) {
             char* left = generateExpr(node->left);
             char* right = generateExpr(node->right);
             char* result = newTemp();
-            // Simulación: AND = MUL para booleanos (0 o 1)
             printf("MUL %s %s %s\n", left, right, result);
             return result;
         }
@@ -226,12 +257,17 @@ void generateCode(ASTNode* node) {
         
         case NODE_ASSIGN:
             declareVar(node->idName);
+            
+            // OPTIMIZACIÓN: Asignaciones directas sin temporales
             if (node->left->type == NODE_INT) {
                 printf("ASSIGN %d %s\n", node->left->intValue, node->idName);
             } else if (node->left->type == NODE_FLOAT) {
                 printf("ASSIGN %.6f %s\n", node->left->floatValue, node->idName);
             } else if (node->left->type == NODE_BOOL) {
                 printf("ASSIGN %d %s\n", node->left->intValue, node->idName);
+            } else if (node->left->type == NODE_ID) {
+                // Asignación directa variable a variable
+                printf("ASSIGN %s %s\n", node->left->idName, node->idName);
             } else {
                 char* expr = generateExpr(node->left);
                 printf("ASSIGN %s %s\n", expr, node->idName);
