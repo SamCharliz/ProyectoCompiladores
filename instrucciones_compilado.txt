@@ -2,37 +2,8 @@
   INSTRUCCIONES DE COMPILACIÓN MANUAL - COMPILADOR FIS-25
 ═══════════════════════════════════════════════════════════════
 
-PASO 1: CREAR ESTRUCTURA DE DIRECTORIOS
-═══════════════════════════════════════════════════════════════
 
-mkdir -p compilador-fis25/src
-mkdir -p compilador-fis25/tests
-cd compilador-fis25
-
-
-PASO 2: COPIAR TODOS LOS ARCHIVOS A SUS DIRECTORIOS
-═══════════════════════════════════════════════════════════════
-
-Coloca en src/:
-  - main.c
-  - lexer.l
-  - parser.y
-  - ast.h
-  - ast.c
-  - symtable.h
-  - symtable.c
-  - semantic.h
-  - semantic.c
-  - codegen.h
-  - codegen.c
-
-Coloca en tests/:
-  - test_simple.fis
-  - test_arrays.fis
-  - test_sierpinski.fis
-
-
-PASO 3: GENERAR PARSER Y LEXER
+PASO 1: GENERAR PARSER Y LEXER
 ═══════════════════════════════════════════════════════════════
 
 cd src
@@ -44,7 +15,7 @@ bison -d parser.y -o parser.tab.c
 flex -o lex.yy.c lexer.l
 
 
-PASO 4: COMPILAR MÓDULOS INDIVIDUALES
+PASO 2: COMPILAR MÓDULOS INDIVIDUALES
 ═══════════════════════════════════════════════════════════════
 
 # Compilar AST
@@ -69,43 +40,23 @@ gcc -c parser.tab.c -o parser.tab.o -Wall -g
 gcc -c lex.yy.c -o lex.yy.o -Wall -g
 
 
-PASO 5: ENLAZAR EJECUTABLE
+PASO 3: ENLAZAR EJECUTABLE
 ═══════════════════════════════════════════════════════════════
 
-gcc main.o ast.o symtable.o semantic.o codegen.o parser.tab.o lex.yy.o \
-    -o compiler -Wall -g
+gcc main.o ast.o symtable.o semantic.o codegen.o parser.tab.o lex.yy.o -o compiler -Wall -g
 
 
-PASO 6: PROBAR EL COMPILADOR
+PASO 4: PROBAR EL COMPILADOR
 ═══════════════════════════════════════════════════════════════
 
 # Volver al directorio principal
 cd ..
 
 # Compilar un programa de prueba
-./src/compiler tests/test_simple.fis -o output.fis25 -v
+./src/compiler tests/test_simple.fis -o output.txt -v
 
 # Ver el resultado
-cat output.fis25
-
-
-═══════════════════════════════════════════════════════════════
-  SCRIPT TODO EN UNO (Copiar y pegar)
-═══════════════════════════════════════════════════════════════
-
-cd src && \
-bison -d parser.y -o parser.tab.c && \
-flex -o lex.yy.c lexer.l && \
-gcc -c ast.c -o ast.o -Wall -g && \
-gcc -c symtable.c -o symtable.o -Wall -g && \
-gcc -c semantic.c -o semantic.o -Wall -g && \
-gcc -c codegen.c -o codegen.o -Wall -g && \
-gcc -c main.c -o main.o -Wall -g && \
-gcc -c parser.tab.c -o parser.tab.o -Wall -g && \
-gcc -c lex.yy.c -o lex.yy.o -Wall -g && \
-gcc main.o ast.o symtable.o semantic.o codegen.o parser.tab.o lex.yy.o -o compiler -Wall -g && \
-echo "✅ Compilación exitosa!" && \
-cd ..
+cat output.txt
 
 
 ═══════════════════════════════════════════════════════════════
@@ -125,7 +76,7 @@ Sintaxis básica:
   ./src/compiler archivo.fis
 
 Con opciones:
-  ./src/compiler archivo.fis -o salida.fis25 -v -a
+  ./src/compiler archivo.fis -o salida.txt -v -a
 
 Opciones disponibles:
   -o <archivo>   Archivo de salida
@@ -133,40 +84,6 @@ Opciones disponibles:
   -a             Mostrar AST
   -s             Omitir análisis semántico
   -h             Ayuda
-
-
-═══════════════════════════════════════════════════════════════
-  SOLUCIÓN DE PROBLEMAS
-═══════════════════════════════════════════════════════════════
-
-ERROR: "bison: command not found"
-SOLUCIÓN: 
-  Ubuntu/Debian: sudo apt-get install bison flex gcc
-  macOS: brew install bison flex gcc
-
-ERROR: "undefined reference to yylex"
-SOLUCIÓN: Asegúrate de compilar lex.yy.c
-
-ERROR: Muchos warnings en lex.yy.c
-SOLUCIÓN: Es normal, son del código generado por Flex
-
-ERROR: "No such file or directory"
-SOLUCIÓN: Verifica que todos los archivos estén en src/
-
-
-═══════════════════════════════════════════════════════════════
-  VERIFICAR INSTALACIÓN
-═══════════════════════════════════════════════════════════════
-
-# Verificar que tienes las herramientas
-which bison
-which flex
-which gcc
-
-# Verificar versiones
-bison --version
-flex --version
-gcc --version
 
 
 ═══════════════════════════════════════════════════════════════
