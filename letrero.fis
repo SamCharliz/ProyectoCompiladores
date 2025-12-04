@@ -1,29 +1,4 @@
-// === VALIDACION OPCION C: LETRERO DINAMICO (MARQUEE) ===
-// Cumple: Control Manual y Deteccion de Eventos (Falling Edge)
-
-// Coordenada X del texto (empezamos al centro)
-int posX = 30;
-
-// Estados de las teclas para detectar "Falling Edge"
-// Tecla 0 (Izquierda), Tecla 1 (Derecha)
-int currLeft = 0;
-int prevLeft = 0;
-int currRight = 0;
-int prevRight = 0;
-
-int delay = 0;
-
-while (1) {
-    // 1. INPUT
-    KEY 0 currLeft;
-    KEY 1 currRight;
-
-    // 2. LOGICA FALLING EDGE (Detectar cuando se SUELTA la tecla)
-    // Si ahora es 0 (suelta) y antes era 1 (presionada) -> Mover
-    
-    // IZQUIERDA
-    if (currLeft == 0) {
-        if (prevLeft == 1) {// letrero_final.fis - Letrero Dinamico "HOLA GRUPO"
+// letrero_final.fis - Letrero Dinamico "HOLA GRUPO"
 // Version Sintaxis Estricta (FIS-25)
 
 PRINT "=== LETRERO DINAMICO ===";
@@ -295,45 +270,4 @@ while (continuar == 1) {
 
     t1_anterior = t1_actual;
     t2_anterior = t2_actual;
-}
-            posX = posX - 2; // Mover letrero a la izquierda
-        }
-    }
-
-    // DERECHA
-    if (currRight == 0) {
-        if (prevRight == 1) {
-            posX = posX + 2; // Mover letrero a la derecha
-        }
-    }
-
-    // Actualizar estados previos
-    prevLeft = currLeft;
-    prevRight = currRight;
-
-    // 3. RENDERIZADO (Letrero "HI")
-    
-    // Borrar pantalla (o solo la zona, simplificado aqui borrando lo anterior manual)
-    // Para simplificar, pintamos negro todo y luego blanco lo nuevo
-    // Nota: En un sistema real borraríamos toda la pantalla, 
-    // aquí borramos el rastro "asumiendo" movimiento pequeño.
-    PIXEL posX+2 30 0; 
-    PIXEL posX-2 30 0;
-    
-    // Dibujar Letra 'I' (Simplificado para el ejemplo)
-    // Una linea vertical en posX
-    PIXEL posX 28 1;
-    PIXEL posX 29 1;
-    PIXEL posX 30 1;
-    PIXEL posX 31 1;
-    PIXEL posX 32 1;
-    
-    // Punto de la 'I'
-    PIXEL posX 26 1;
-
-    // 4. PEQUEÑO DELAY (Para estabilidad)
-    delay = 0;
-    while (delay < 500) {
-        delay = delay + 1;
-    }
 }
