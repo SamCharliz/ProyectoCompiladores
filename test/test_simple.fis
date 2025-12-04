@@ -1,0 +1,27 @@
+// test_simple.fis - Programa de prueba básico
+
+// Variables simples
+int x = 10;
+int y = 20;
+int suma = 0;
+
+// Operación aritmética
+suma = x + y;
+
+// Dibujar píxel en el centro
+PIXEL 64 64 1;
+
+// Condicional simple
+if (suma > 25) {
+    PIXEL 10 10 1;
+}
+
+// Loop simple
+int i = 0;
+while (i < 5) {
+    PIXEL i i 1;
+    i = i + 1;
+}
+
+// Entrada y salida
+PRINT "Programa completado";

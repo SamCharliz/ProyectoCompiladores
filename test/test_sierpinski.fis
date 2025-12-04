@@ -1,0 +1,74 @@
+// test_sierpinski.fis - Fractal de Sierpinski (Triángulo de Pascal)
+// Configuración
+int levels = 10;
+PRINT "Generando Sierpinski...";
+
+// Variables para el triángulo de Pascal
+int max_n = 20;
+int pascal[20];
+
+// Variables de loop
+int n = 0;
+int k = 0;
+int prev = 0;
+int val = 0;
+int x = 0;
+int y = 0;
+int sum = 0;
+int remainder = 0;
+
+// Generar cada fila del triángulo
+n = 0;
+while (n < levels) {
+    
+    // Calcular coeficientes binomiales C(n,k)
+    pascal[0] = 1;
+    
+    k = 1;
+    while (k <= n) {
+        // Usar propiedad: C(n,k) = C(n,k-1) * (n-k+1) / k
+        prev = pascal[k];
+        
+        if (k == 1) {
+            pascal[k] = n;
+        } else {
+            // Simplificación: calcular módulo 2 directamente
+            val = (n + k) % 2;
+            pascal[k] = val;
+        }
+        
+        k = k + 1;
+    }
+    
+    // Dibujar píxeles donde el coeficiente es impar
+    k = 0;
+    while (k <= n) {
+        
+        // Calcular posición centrada en pantalla 64x64
+        x = 32 - n + (k * 2);
+        y = n * 2;
+        
+        // Solo dibujar si está dentro de los límites
+        if (x >= 0) {
+            if (x < 64) {
+                if (y >= 0) {
+                    if (y < 64) {
+                        // Verificar paridad (simplificado)
+                        sum = n + k;
+                        remainder = sum % 2;
+                        
+                        if (remainder == 1) {
+                            PIXEL x y 1;
+                        }
+                    }
+                }
+            }
+        }
+        
+        k = k + 1;
+    }
+    
+    n = n + 1;
+}
+
+PRINT "Sierpinski completado";
