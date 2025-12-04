@@ -1,4 +1,3 @@
-// ast.h - Versión completa con soporte FIS-25
 #ifndef AST_H
 #define AST_H
 
@@ -7,40 +6,42 @@ typedef enum {
     NODE_FLOAT,
     NODE_ID,
     NODE_ASSIGN,
-    NODE_PIXEL,     // PIXEL x y c
-    NODE_KEY,       // KEY k dest
-    NODE_IF,        // if (cond) { ... }
-    NODE_IF_ELSE,   // if (cond) { ... } else { ... }
-    NODE_WHILE,     // while (cond) { ... }
-    NODE_SEQ,       // Secuencia de instrucciones
-    NODE_ADD,       // Suma
-    NODE_SUB,       // Resta
-    NODE_MUL,       // Multiplicación
-    NODE_DIV,       // División
-    NODE_MOD,       // Módulo
-    NODE_LT,        // Menor que <
-    NODE_GT,        // Mayor que >
-    NODE_LTE,       // Menor o igual <=
-    NODE_GTE,       // Mayor o igual >=
-    NODE_EQ,        // Igual ==
-    NODE_NEQ,       // Diferente !=
-    NODE_BLOCK      // Bloque { ... }
+    NODE_PIXEL,     
+    NODE_KEY,       
+    NODE_IF,        
+    NODE_IF_ELSE,   
+    NODE_WHILE,     
+    NODE_SEQ,       
+    NODE_ADD,       
+    NODE_SUB,       
+    NODE_MUL,       
+    NODE_DIV,       
+    NODE_MOD,       
+    NODE_LT,        
+    NODE_GT,        
+    NODE_LTE,       
+    NODE_GTE,       
+    NODE_EQ,        
+    NODE_NEQ,       
+    NODE_AND,       // <--- IMPORTANTE: Debe tener esto
+    NODE_OR,        // <--- IMPORTANTE: Y esto
+    NODE_BLOCK      
 } NodeType;
 
 typedef struct ASTNode {
     NodeType type;
-    int intValue;          // Para números enteros
-    float floatValue;      // Para números flotantes
-    char* idName;          // Para variables
+    int intValue;          
+    float floatValue;      
+    char* idName;          
     struct ASTNode *left;
     struct ASTNode *right;
-    struct ASTNode *extra; // Para tercer argumento
-    struct ASTNode *cond;  // Para condiciones en IF/WHILE
-    struct ASTNode *body;  // Para cuerpo de IF/WHILE
-    struct ASTNode *elseBody; // Para cuerpo de ELSE
+    struct ASTNode *extra; 
+    struct ASTNode *cond;  
+    struct ASTNode *body;  
+    struct ASTNode *elseBody;
 } ASTNode;
 
-// Funciones para crear nodos
+// Declaraciones
 ASTNode* newInt(int val);
 ASTNode* newFloat(float val);
 ASTNode* newId(char* name);
@@ -53,24 +54,5 @@ ASTNode* newIf(ASTNode* cond, ASTNode* body);
 ASTNode* newIfElse(ASTNode* cond, ASTNode* body, ASTNode* elseBody);
 ASTNode* newWhile(ASTNode* cond, ASTNode* body);
 ASTNode* newBlock(ASTNode* stmts);
-
-// Tabla de símbolos simple
-typedef struct {
-    char* name;
-    int value;
-} Symbol;
-
-extern Symbol symTable[100];
-extern int symCount;
-
-// Declaración de variables
-void declareVar(char* name);
-
-// Generador de temporales
-char* newTemp();
-
-// Generación de código
-void generateCode(ASTNode* node);
-char* generateExpr(ASTNode* node);
 
 #endif
